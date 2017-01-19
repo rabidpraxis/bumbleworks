@@ -1,19 +1,29 @@
 describe Bumbleworks::StorageParticipant do
+  let(:sid) { :storage_id }
   let(:workitem) {
-    double(:sid => :storage_id, :to_h => {
+    double(:sid => sid, :to_h => {
       'fei' => { 'wfid' => :the_workflow_id }
     })
   }
+
   subject { described_class.new(Bumbleworks.dashboard.context) }
 
   describe "#on_workitem" do
-    it "stores workitem and triggers on dispatch" do
+    it "stores workitem, delegates to work, and triggers on dispatch" do
+      expect(subject).to receive(:work).with(sid)
       expect(subject).to receive(:trigger_on_dispatch)
       expect {
         subject._on_workitem(workitem)
       }.to change {
         Bumbleworks.dashboard.context.storage.get_many("workitems").count
       }.by(1)
+    end
+
+    it "behaves when #work is not implemented" do
+      expect(subject).to receive(:trigger_on_dispatch)
+      expect {
+        subject._on_workitem(workitem)
+      }.not_to raise_error
     end
   end
 

@@ -154,6 +154,17 @@ module Bumbleworks
         @dashboard = nil
       end
 
+      # Move a workitem ahead. This is a helper method for Bumbleworks::BackgroundStorageParticipant
+      # that accepts a sid or a full ruote workitem. This will not work with a Bumbleworks::Workitem.
+      #
+      def complete_workitem(sid_or_wi)
+        unless sid_or_wi.kind_of? ::Ruote::Workitem
+          sid_or_wi = dashboard.storage_participant[sid_or_wi]
+        end
+
+        dashboard.storage_participant.proceed(sid_or_wi)
+      end
+
     private
 
       def initialize_storage_adapter

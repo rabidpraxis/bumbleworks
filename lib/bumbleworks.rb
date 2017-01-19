@@ -39,7 +39,8 @@ module Bumbleworks
     def_delegators Bumbleworks::Ruote,
       :dashboard, :start_worker!,
       :cancel_process!, :kill_process!,
-      :cancel_all_processes!, :kill_all_processes!
+      :cancel_all_processes!, :kill_all_processes!,
+      :complete_workitem
     def_delegator Bumbleworks::ProcessDefinition, :define, :define_process
 
     # @public

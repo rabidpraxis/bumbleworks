@@ -441,4 +441,32 @@ describe Bumbleworks::Ruote do
       expect(described_class.dashboard).not_to eq(dashboard)
     end
   end
+
+  describe ".complete_workitem" do
+    let(:sid) { "1234-abc" }
+    let(:workitem) { Ruote::Workitem.new({}) }
+    let(:dashboard) { instance_double(Ruote::Dashboard) }
+    let(:storage_participant) { instance_double(Ruote::StorageParticipant) }
+
+    context "passing in a sid" do
+      it "progresses workitem forward" do
+        expect(described_class).to receive(:dashboard).twice.and_return(dashboard)
+        expect(dashboard).to receive(:storage_participant).twice.and_return(storage_participant)
+        expect(storage_participant).to receive(:[]).with(sid).and_return(workitem)
+        expect(storage_participant).to receive(:proceed).with(workitem)
+
+        described_class.complete_workitem(sid)
+      end
+    end
+
+    context "passing in a workitem" do
+      it "progresses workitem forward" do
+        expect(described_class).to receive(:dashboard).once.and_return(dashboard)
+        expect(dashboard).to receive(:storage_participant).and_return(storage_participant)
+        expect(storage_participant).to receive(:proceed).with(workitem)
+
+        described_class.complete_workitem(workitem)
+      end
+    end
+  end
 end
