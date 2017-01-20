@@ -442,30 +442,46 @@ describe Bumbleworks::Ruote do
     end
   end
 
-  describe ".workitem_complete" do
+  context "when manipulating workitems" do
     let(:sid) { "1234-abc" }
     let(:workitem) { Ruote::Workitem.new({}) }
     let(:dashboard) { instance_double(Ruote::Dashboard) }
     let(:storage_participant) { instance_double(Ruote::StorageParticipant) }
 
-    context "passing in a sid" do
-      it "progresses workitem forward" do
-        expect(described_class).to receive(:dashboard).twice.and_return(dashboard)
-        expect(dashboard).to receive(:storage_participant).twice.and_return(storage_participant)
+    describe ".gather_workitem" do
+      it "returns a workitem from a sid" do
+        expect(described_class).to receive(:dashboard).and_return(dashboard)
+        expect(dashboard).to receive(:storage_participant).and_return(storage_participant)
         expect(storage_participant).to receive(:[]).with(sid).and_return(workitem)
+
+        expect(described_class.gather_workitem(sid)).to be_a_kind_of(Ruote::Workitem)
+      end
+
+      it "passes through a workitem" do
+        expect(described_class.gather_workitem(workitem)).to be_a_kind_of(Ruote::Workitem)
+      end
+    end
+
+    describe ".workitem_complete" do
+      it "progresses workitem forward" do
+        expect(described_class).to receive(:gather_workitem).and_return(workitem)
+        expect(described_class).to receive(:dashboard).and_return(dashboard)
+        expect(dashboard).to receive(:storage_participant).and_return(storage_participant)
         expect(storage_participant).to receive(:proceed).with(workitem)
 
         described_class.workitem_complete(sid)
       end
     end
 
-    context "passing in a workitem" do
-      it "progresses workitem forward" do
-        expect(described_class).to receive(:dashboard).once.and_return(dashboard)
+    describe ".workitem_failed" do
+      it "cancels a workitem with an error" do
+        err = RuntimeError.new("Here is a runtime error message")
+        expect(described_class).to receive(:gather_workitem).and_return(workitem)
+        expect(described_class).to receive(:dashboard).and_return(dashboard)
         expect(dashboard).to receive(:storage_participant).and_return(storage_participant)
-        expect(storage_participant).to receive(:proceed).with(workitem)
+        expect(storage_participant).to receive(:flunk).with(workitem, err)
 
-        described_class.workitem_complete(workitem)
+        described_class.workitem_failed(sid, err)
       end
     end
   end

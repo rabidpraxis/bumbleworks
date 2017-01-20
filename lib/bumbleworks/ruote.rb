@@ -158,11 +158,19 @@ module Bumbleworks
       # that accepts a sid or a full ruote workitem. This will not work with a Bumbleworks::Workitem.
       #
       def workitem_complete(sid_or_wi)
-        unless sid_or_wi.kind_of? ::Ruote::Workitem
-          sid_or_wi = dashboard.storage_participant[sid_or_wi]
-        end
+        dashboard.storage_participant.proceed(gather_workitem(sid_or_wi))
+      end
 
-        dashboard.storage_participant.proceed(sid_or_wi)
+      # Halt and associate an exception with a workitem
+      #
+      def workitem_failed(sid_or_wi, err)
+        dashboard.storage_participant.flunk(gather_workitem(sid_or_wi), err)
+      end
+
+      # Extract a workitem from a sid, passing through already initialized workitems
+      #
+      def gather_workitem(sid_or_wi)
+        sid_or_wi.kind_of?(::Ruote::Workitem) ? sid_or_wi : dashboard.storage_participant[sid_or_wi]
       end
 
     private
