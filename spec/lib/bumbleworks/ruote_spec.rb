@@ -442,7 +442,7 @@ describe Bumbleworks::Ruote do
     end
   end
 
-  describe ".complete_workitem" do
+  describe ".workitem_complete" do
     let(:sid) { "1234-abc" }
     let(:workitem) { Ruote::Workitem.new({}) }
     let(:dashboard) { instance_double(Ruote::Dashboard) }
@@ -455,7 +455,7 @@ describe Bumbleworks::Ruote do
         expect(storage_participant).to receive(:[]).with(sid).and_return(workitem)
         expect(storage_participant).to receive(:proceed).with(workitem)
 
-        described_class.complete_workitem(sid)
+        described_class.workitem_complete(sid)
       end
     end
 
@@ -465,7 +465,7 @@ describe Bumbleworks::Ruote do
         expect(dashboard).to receive(:storage_participant).and_return(storage_participant)
         expect(storage_participant).to receive(:proceed).with(workitem)
 
-        described_class.complete_workitem(workitem)
+        described_class.workitem_complete(workitem)
       end
     end
   end

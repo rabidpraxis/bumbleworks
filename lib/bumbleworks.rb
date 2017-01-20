@@ -40,7 +40,7 @@ module Bumbleworks
       :dashboard, :start_worker!,
       :cancel_process!, :kill_process!,
       :cancel_all_processes!, :kill_all_processes!,
-      :complete_workitem
+      :workitem_complete
     def_delegator Bumbleworks::ProcessDefinition, :define, :define_process
 
     # @public
